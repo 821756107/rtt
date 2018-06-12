@@ -53,3 +53,4 @@
         
     4. 运行  
        启动脚本  ./startup.sh start
+ 
