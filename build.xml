@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="build">
+	<property name="src" value="${basedir}/src" />
+	<property name="dest" value="${basedir}/bin" />
+	<property name="jar.name" value="${basedir}/rtt.jar" />
+          ########注意#######
+        编译的时候只需修改这个 指定编译 后产生的jar包名。
+  
+  
+  
+	<property name="lib.path" value="${basedir}/lib" />
+
+	<property name="debug" value="off" />
+	<property name="optimize" value="on" />
+
+	<target name="clean" >
+		  <delete dir="${dest}"/>
+	</target>
+	<!--创建bin目录  -->
+	<target name="init">
+		<mkdir dir="${dest}" />
+	</target>
+
+	<!--定义编译时候的classpath为${basedir}/lib下的所有jar文件 -->
+	<path id="classpath">
+		<fileset dir="${lib.path}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<!--编译，指定classpath为上面定义的calsspath -->
+	<target name="compile" depends="init">
+		<javac srcdir="${src}" destdir="${dest}" debug="${debug}" optimize="${optimize}" encoding="utf-8">
+			<classpath refid="classpath">
+			</classpath>
+		</javac>
+		
+		<!-- 编译时，将src下面的properties文件拷贝到${basedir}/bin下 -->
+		<copy todir="${dest}">
+			<fileset dir="${src}" >
+				<include name="*.properties"/>
+			</fileset>
+			<fileset dir="${src}">
+				<include name="*.sh"/>
+			</fileset>
+		</copy>
+
+	</target>
+	
+
+	<!-- 构建项目 -->
+	<target name="build" depends="compile">
+		<!-- 做lib路径映射为antWork/lib下的所有jar文件 -->
+		<pathconvert property="libs.project" pathsep=" ">
+			<mapper>
+				<chainedmapper>
+					<flattenmapper />
+					<globmapper from="*" to="lib/*" />
+				</chainedmapper>
+			</mapper>
+
+			<path id="classpath">
+				<fileset dir="${lib.path}">
+					<include name="**/*.jar" />
+				</fileset>
+			</path>
+		</pathconvert>
+		
+		<!-- 用jar命令打包项目,指定参数Class-Path的值为上面映射的路径 -->
+		<jar destfile="${jar.name}" basedir="${dest}">
+			<manifest >
+				<attribute name="Class-Path" value="${libs.project}" />
+				<!--attribute name="Main-class" value="nlp.NlpUtil"/-->
+				<attribute name="Main-class" value="com.rtt.test.TestServer"/>
+        
+        ########注意#######
+        编译的时候如果需要可以修改这个  main class
+        
+        
+        
+			</manifest>
+		</jar>
+	</target>
+
+</project>
